@@ -26,7 +26,7 @@ import torch
 
 from pytorch_lightning import _logger as log
 from pytorch_lightning.callbacks.base import Callback
-from pytorch_lightning.utilities import rank_zero_warn
+from pytorch_lightning.utilities import rank_zero_warn, rank_zero_info
 from pytorch_lightning.utilities.xla_device_utils import XLADeviceUtils
 
 TPU_AVAILABLE = XLADeviceUtils.tpu_device_exists()
@@ -70,8 +70,15 @@ class EarlyStopping(Callback):
         'max': torch.gt,
     }
 
-    def __init__(self, monitor: str = 'early_stop_on', min_delta: float = 0.0, patience: int = 3,
-                 verbose: bool = False, mode: str = 'auto', strict: bool = True):
+    def __init__(
+        self,
+        monitor: str = 'early_stop_on',
+        min_delta: float = 0.0,
+        patience: int = 3,
+        verbose: bool = False,
+        mode: str = 'min',
+        strict: bool = True
+    ):
         super().__init__()
         self.monitor = monitor
         self.patience = patience
@@ -86,21 +93,34 @@ class EarlyStopping(Callback):
         # It is set to False initially and overwritten, if eval results have been validated
         self.based_on_eval_results = False
 
-        if mode not in self.mode_dict and mode != 'auto':
+        self.__init_monitor_mode()
+
+        self.min_delta *= 1 if self.monitor_op == torch.gt else -1
+        self.best_score = torch_inf if self.monitor_op == torch.lt else -torch_inf
+
+    def __init_monitor_mode(self):
+        # TODO: Add MisconfigurationException when auto mode is removed in v1.3
+        if self.mode not in self.mode_dict and self.mode != 'auto':
             if self.verbose > 0:
-                log.info(f'EarlyStopping mode {mode} is unknown, fallback to auto mode.')
+                rank_zero_warn(
+                    f'EarlyStopping mode {mode} is unknown, fallback to auto mode.',
+                    RuntimeWarning,
+                )
             self.mode = 'auto'
 
         if self.mode == 'auto':
+            rank_zero_warn(
+                f"mode='auto' is deprecated in v1.1 and will be removed in v1.3",
+                DeprecationWarning
+            )
+
             if self.monitor == 'acc':
                 self.mode = 'max'
             else:
                 self.mode = 'min'
-            if self.verbose > 0:
-                log.info(f'EarlyStopping mode set to {self.mode} for monitoring {self.monitor}.')
 
-        self.min_delta *= 1 if self.monitor_op == torch.gt else -1
-        self.best_score = torch_inf if self.monitor_op == torch.lt else -torch_inf
+            if self.verbose > 0:
+                rank_zero_info(f'EarlyStopping mode set to {self.mode} for monitoring {self.monitor}.')
 
     def _validate_condition_metric(self, logs):
         monitor_val = logs.get(self.monitor)
