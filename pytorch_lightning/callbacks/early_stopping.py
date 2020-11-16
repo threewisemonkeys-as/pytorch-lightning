@@ -95,9 +95,6 @@ class EarlyStopping(Callback):
 
         self.__init_monitor_mode()
 
-        if self.verbose > 0:
-            rank_zero_info(f'EarlyStopping mode set to {self.mode} for monitoring {self.monitor}.')
-
         self.min_delta *= 1 if self.monitor_op == torch.gt else -1
         self.best_score = torch_inf if self.monitor_op == torch.lt else -torch_inf
 
@@ -121,6 +118,9 @@ class EarlyStopping(Callback):
                 self.mode = 'max'
             else:
                 self.mode = 'min'
+
+            if self.verbose > 0:
+                rank_zero_info(f'EarlyStopping mode set to {self.mode} for monitoring {self.monitor}.')
 
     def _validate_condition_metric(self, logs):
         monitor_val = logs.get(self.monitor)
