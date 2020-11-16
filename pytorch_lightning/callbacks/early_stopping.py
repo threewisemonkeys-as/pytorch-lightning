@@ -77,7 +77,7 @@ class EarlyStopping(Callback):
         patience: int = 3,
         verbose: bool = False,
         mode: str = 'min',
-        strict: bool = True
+        strict: bool = True,
     ):
         super().__init__()
         self.monitor = monitor
@@ -95,11 +95,14 @@ class EarlyStopping(Callback):
 
         self.__init_monitor_mode()
 
+        if self.verbose > 0:
+            rank_zero_info(f'EarlyStopping mode set to {self.mode} for monitoring {self.monitor}.')
+
         self.min_delta *= 1 if self.monitor_op == torch.gt else -1
         self.best_score = torch_inf if self.monitor_op == torch.lt else -torch_inf
 
     def __init_monitor_mode(self):
-        # TODO: Add MisconfigurationException when auto mode is removed in v1.3
+        # TODO: Update with MisconfigurationException when auto mode is removed in v1.3
         if self.mode not in self.mode_dict and self.mode != 'auto':
             if self.verbose > 0:
                 rank_zero_warn(
@@ -118,9 +121,6 @@ class EarlyStopping(Callback):
                 self.mode = 'max'
             else:
                 self.mode = 'min'
-
-            if self.verbose > 0:
-                rank_zero_info(f'EarlyStopping mode set to {self.mode} for monitoring {self.monitor}.')
 
     def _validate_condition_metric(self, logs):
         monitor_val = logs.get(self.monitor)
