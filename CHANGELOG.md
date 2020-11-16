@@ -43,7 +43,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Deprecated
 
-- Deprecated `mode='auto'` from ModelCheckpoint and EarlyStopping ([#4695](https://github.com/PyTorchLightning/pytorch-lightning/pull/4695))
+- Deprecated `mode='auto'` from `ModelCheckpoint` and `EarlyStopping` ([#4695](https://github.com/PyTorchLightning/pytorch-lightning/pull/4695))
 
 
 ### Removed
