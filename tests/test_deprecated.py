@@ -1,18 +1,17 @@
 """Test deprecated functionality which will be removed in vX.Y.Z"""
-from argparse import ArgumentParser
-import pytest
 import sys
+from argparse import ArgumentParser
 from unittest import mock
 
+import pytest
 import torch
-
-from tests.base import EvalModelTemplate
-from pytorch_lightning.metrics.functional.classification import auc
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.metrics.functional.classification import auc
 from pytorch_lightning.profiler.profilers import PassThroughProfiler, SimpleProfiler
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
+from tests.base import EvalModelTemplate
 
 
 def test_tbd_remove_in_v1_3_0(tmpdir):
@@ -113,6 +112,7 @@ class ModelVer0_7(EvalModelTemplate):
         return {'test_loss': torch.tensor(0.7)}
 
 
-def test_auc_reorder_remove_in_v1_1_0():
+def test_
+_reorder_remove_in_v1_1_0():
     with pytest.deprecated_call(match='The `reorder` parameter to `auc` has been deprecated'):
         _ = auc(torch.tensor([0, 1, 2, 3]), torch.tensor([0, 1, 2, 2]), reorder=True)
