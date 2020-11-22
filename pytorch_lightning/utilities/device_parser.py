@@ -105,7 +105,7 @@ def parse_tpu_cores(tpu_cores: Union[int, str, List]) -> Optional[Union[List[int
     if not _tpu_cores_valid(tpu_cores):
         raise MisconfigurationException("`tpu_cores` can only be 1, 8 or [<1-8>]")
 
-    if not XLADeviceUtils.tpu_device_exists():
+    if tpu_cores is not None and not XLADeviceUtils.tpu_device_exists():
         raise MisconfigurationException('No TPU devices were found.')
 
     return tpu_cores
