@@ -25,6 +25,10 @@ def test_tbd_remove_in_v1_3_0(tmpdir):
     with pytest.deprecated_call(match='will be removed in v1.3'):
         callback = EarlyStopping(mode='auto')
 
+    # Deprecate prefix
+    with pytest.deprecated_call(match='will be removed in v1.3'):
+        callback = ModelCheckpoint(prefix='temp')
+
 
 def test_tbd_remove_in_v1_2_0():
     with pytest.deprecated_call(match='will be removed in v1.2'):
