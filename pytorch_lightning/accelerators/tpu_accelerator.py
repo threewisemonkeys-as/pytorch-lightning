@@ -30,7 +30,7 @@ from pytorch_lightning.utilities.cloud_io import atomic_save
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from pytorch_lightning.utilities.xla_device_utils import XLADeviceUtils
 
-if importlib.util.find_spec("torch_xla"):
+if XLADeviceUtils.xla_available():
     import torch_xla
     import torch_xla.core.xla_model as xm
     import torch_xla.distributed.parallel_loader as xla_pl
@@ -56,10 +56,6 @@ class TPUAccelerator(Accelerator):
 
     def setup(self, model):
         rank_zero_info(f'training on {self.trainer.tpu_cores} TPU cores')
-
-        # TODO: Move this check to Trainer __init__ or device parser
-        if not XLADeviceUtils.tpu_device_exists():
-            raise MisconfigurationException('PyTorch XLA not installed.')
 
         # see: https://discuss.pytorch.org/t/segfault-with-multiprocessing-queue/81292/2
         self.start_method = 'fork'
