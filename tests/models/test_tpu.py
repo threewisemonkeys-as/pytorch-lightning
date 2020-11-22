@@ -28,7 +28,7 @@ from tests.base import EvalModelTemplate
 from tests.base.datasets import TrialMNIST
 from tests.base.develop_utils import pl_multi_process_test
 
-if importlib.util.find_spec("torch_xla"):
+if xla_utils.xla_available():
     import torch_xla
     import torch_xla.distributed.xla_multiprocessing as xmp
     SERIAL_EXEC = xmp.MpSerialExecutor()

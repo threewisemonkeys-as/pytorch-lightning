@@ -46,7 +46,7 @@ from torch import ScriptModule, Tensor
 from torch.nn import Module
 from torch.optim.optimizer import Optimizer
 
-if importlib.util.find_spec("torch_xla"):
+if XLADeviceUtils.xla_available():
     import torch_xla.core.xla_model as xm
 
 

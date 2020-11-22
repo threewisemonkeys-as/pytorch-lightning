@@ -83,13 +83,23 @@ class XLADeviceUtils:
             return device_type == "TPU"
 
     @staticmethod
+    def xla_available() -> bool:
+        """
+        Check if XLA library is installed
+
+        Return:
+            A boolean value indicating if a XLA is installed
+        """
+        return TORCHXLA_AVAILABLE
+
+    @staticmethod
     def tpu_device_exists() -> bool:
         """
-        Public method to check if TPU is available
+        Runs XLA device check within a separate process
 
         Return:
             A boolean value indicating if a TPU device exists on the system
         """
-        if XLADeviceUtils.TPU_AVAILABLE is None and TORCHXLA_AVAILABLE:
+        if XLADeviceUtils.TPU_AVAILABLE is None and XLADeviceUtils.xla_available():
             XLADeviceUtils.TPU_AVAILABLE = pl_multi_process(XLADeviceUtils._is_device_tpu)()
         return XLADeviceUtils.TPU_AVAILABLE
