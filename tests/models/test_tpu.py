@@ -217,7 +217,7 @@ def test_dataloaders_passed_to_fit(tmpdir):
     ['tpu_cores', 'expected_tpu_id'],
     [pytest.param(1, None), pytest.param(8, None), pytest.param([1], 1), pytest.param([8], 8)],
 )
-@pytest.mark.skipif(XLADeviceUtils.tpu_device_exists(), reason="test requires missing TPU")
+@pytest.mark.skipif(not XLADeviceUtils.tpu_device_exists(), reason="test requires missing TPU")
 def test_tpu_id_to_be_as_expected(tpu_cores, expected_tpu_id):
     """Test if trainer.tpu_id is set as expected"""
     assert Trainer(tpu_cores=tpu_cores).tpu_id == expected_tpu_id
@@ -308,12 +308,13 @@ def test_broadcast_on_tpu():
     ],
 )
 @pytest.mark.skipif(not XLADeviceUtils.tpu_device_exists(), reason="test requires TPU machine")
+@pl_multi_process_test
 def test_tpu_choice(tmpdir, tpu_cores, expected_tpu_id, error_expected):
     if error_expected:
         with pytest.raises(MisconfigurationException, match=r".*tpu_cores` can only be 1, 8 or [<1-8>]*"):
-            Trainer(default_root_dir=tmpdir, tpu_cores=tpu_cores, auto_select_gpus=True)
+            Trainer(default_root_dir=tmpdir, tpu_cores=tpu_cores)
     else:
-        trainer = Trainer(default_root_dir=tmpdir, tpu_cores=tpu_cores, auto_select_gpus=True)
+        trainer = Trainer(default_root_dir=tmpdir, tpu_cores=tpu_cores)
         assert trainer.tpu_id == expected_tpu_id
 
 
