@@ -230,7 +230,6 @@ def test_tpu_misconfiguration():
 
 
 @pytest.mark.skipif(XLADeviceUtils.tpu_device_exists(), reason="test requires missing TPU")
-@pl_multi_process_test
 def test_exception_when_no_tpu_found(tmpdir):
     """Test if exception is thrown when xla devices are not available"""
 
